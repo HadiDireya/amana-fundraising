@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 
 // --- DATA: In a real Next.js app, this would come from getStaticProps or an API call ---
@@ -211,10 +212,46 @@ const TagIcon = () => (
     </svg>
 );
 
+// --- Type Definitions ---
+
+interface StatCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: string | number;
+  color: string;
+}
+
+type UrgencyLevel = 'High' | 'Medium' | 'Low' | 'Critical';
+
+interface CauseType {
+  id: number;
+  title: string;
+  category: string;
+  status: string;
+  urgency_level: UrgencyLevel;
+  short_description: string;
+  image_url: string;
+  location: { city: string; country: string };
+  metrics: {
+    goal_amount: number;
+    raised_amount: number;
+    percentage_funded: number;
+    donor_count: number;
+    days_remaining: number;
+  };
+  impact_metrics: {
+    beneficiaries: number;
+    metric_description: string;
+  };
+}
+
+interface CauseCardProps {
+    cause: CauseType;
+}
 
 // --- UI Components ---
 
-const StatCard = ({ icon, title, value, color }) => (
+const StatCard = ({ icon, title, value, color }: StatCardProps) => (
     <div className="bg-white p-6 rounded-2xl shadow-lg flex items-center space-x-4 transition-all duration-300 hover:shadow-xl hover:scale-105">
         <div className={`p-3 rounded-full bg-${color}-100`}>{icon}</div>
         <div>
@@ -224,12 +261,12 @@ const StatCard = ({ icon, title, value, color }) => (
     </div>
 );
 
-const CauseCard = ({ cause }) => {
+const CauseCard = ({ cause }: CauseCardProps) => {
     const { title, short_description, image_url, metrics, location, category, urgency_level, impact_metrics } = cause;
     const formattedRaised = metrics.raised_amount.toLocaleString();
     const formattedGoal = metrics.goal_amount.toLocaleString();
 
-    const urgencyStyles = {
+    const urgencyStyles: { [key in UrgencyLevel]: string } = {
         'High': 'bg-red-100 text-red-800',
         'Medium': 'bg-yellow-100 text-yellow-800',
         'Low': 'bg-gray-100 text-gray-800',
@@ -294,9 +331,9 @@ const CauseCard = ({ cause }) => {
 
 // --- Main Page Component ---
 
-export default function AmanaFundraisingPage() {
+export default function Page() {
     const { company_info, fundraising_stats, causes } = fundraisingData;
-    const activeCauses = causes.filter(c => c.status === 'Active');
+    const activeCauses = causes.filter((c: CauseType) => c.status === 'Active');
 
     return (
         <div className="bg-gray-50 min-h-screen font-sans">
